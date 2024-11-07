@@ -1,17 +1,13 @@
 package AndroidAssignment.notespro;
 
-import android.app.DownloadManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,11 +16,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.Query;
 
+import java.util.Objects;
+
 public class MainActivity extends AppCompatActivity {
 
     FloatingActionButton addNoteBtn;
     RecyclerView recyclerView;
     ImageButton menuBtn;
+    Button changePasswordButton; // Change Password button
     NoteAdapter noteAdapter;
 
     @Override
@@ -33,39 +32,45 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         addNoteBtn = findViewById(R.id.add_note_btn);
-        recyclerView = findViewById(R.id.recyler_view);
+        recyclerView = findViewById(R.id.recycler_view);
         menuBtn = findViewById(R.id.menu_btn);
+        changePasswordButton = findViewById(R.id.change_password_button); // Initialize Change Password button
 
+        // Set up listeners
+        addNoteBtn.setOnClickListener((v) -> startActivity(new Intent(MainActivity.this, NoteDetailsActivity.class)));
+        menuBtn.setOnClickListener((v) -> showMenu());
 
-        addNoteBtn.setOnClickListener((v)->startActivity(new Intent(MainActivity.this,NoteDetailsActivity.class)));
-        menuBtn.setOnClickListener((v)->showMenu());
+        // Listener for Change Password button
+        changePasswordButton.setOnClickListener(v -> {
+            // Start ChangePasswordActivity
+            Intent intent = new Intent(MainActivity.this, ChangePasswordActivity.class);
+            startActivity(intent);
+        });
+
         setupRecyclerView();
     }
 
-    void showMenu(){
-        PopupMenu popupMenu = new PopupMenu(MainActivity.this,menuBtn);
+    void showMenu() {
+        PopupMenu popupMenu = new PopupMenu(MainActivity.this, menuBtn);
         popupMenu.getMenu().add("Logout");
         popupMenu.show();
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                if(menuItem.getTitle()=="Logout"){
-                    FirebaseAuth.getInstance().signOut();
-                    startActivity(new Intent(MainActivity.this,LoginActivity.class));
-                    finish();
-                    return true;
-                }
-                return false;
+        popupMenu.setOnMenuItemClickListener(menuItem -> {
+            if (Objects.requireNonNull(menuItem.getTitle()).equals("Logout")) {
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                finish();
+                return true;
             }
+            return false;
         });
     }
 
-    void setupRecyclerView(){
-        Query query =Utility.getCollectionReferenceForNotes().orderBy("timestamp",Query.Direction.DESCENDING);
+    void setupRecyclerView() {
+        Query query = Utility.getCollectionReferenceForNotes().orderBy("timestamp", Query.Direction.DESCENDING);
         FirestoreRecyclerOptions<Note> options = new FirestoreRecyclerOptions.Builder<Note>()
-                .setQuery(query,Note.class).build();
+                .setQuery(query, Note.class).build();
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        noteAdapter = new NoteAdapter(options,this);
+        noteAdapter = new NoteAdapter(options, this);
         recyclerView.setAdapter(noteAdapter);
     }
 

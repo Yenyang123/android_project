@@ -4,13 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/my_primary"
+    android:background="@color/teal_700"
     android:padding="16dp"
     tools:context=".MainActivity">
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/title_bar_layout">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -18,7 +20,7 @@
             android:text="Notes"
             android:textSize="32sp"
             android:textColor="@color/white"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <ImageButton
             android:layout_width="36dp"
@@ -28,20 +30,29 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             app:tint="@color/white"
-            android:background="?attr/selectableItemBackgroundBorderless"
-
-            />
-
-
+            android:background="?attr/selectableItemBackgroundBorderless" />
     </RelativeLayout>
 
+    <!-- Change Password Button -->
+    <Button
+        android:id="@+id/change_password_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title_bar_layout"
+        android:layout_marginTop="16dp"
+        android:background="@color/teal_200"
+        android:text="Change Password"
+        android:textColor="#5E35B1" />
+
+    <!-- RecyclerView for Notes -->
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/title_bar_layout"
-        android:id="@+id/recyler_view"/>
+        android:layout_below="@id/change_password_button"
+        android:layout_marginTop="8dp"
+        android:id="@+id/recycler_view" />
 
-
+    <!-- Floating Action Button for Adding New Note -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -49,8 +60,6 @@
         android:backgroundTint="@color/white"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:src="@drawable/baseline_add_24"
-        />
-
+        android:src="@drawable/baseline_add_24" />
 
 </RelativeLayout>

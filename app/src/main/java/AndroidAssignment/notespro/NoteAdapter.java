@@ -12,10 +12,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 public class NoteAdapter extends FirestoreRecyclerAdapter<Note, NoteAdapter.NoteViewHolder> {
-    Context context;
-
+    private final Context context;
 
     public NoteAdapter(@NonNull FirestoreRecyclerOptions<Note> options, Context context) {
         super(options);
@@ -24,16 +24,18 @@ public class NoteAdapter extends FirestoreRecyclerAdapter<Note, NoteAdapter.Note
 
     @Override
     protected void onBindViewHolder(@NonNull NoteViewHolder holder, int position, @NonNull Note note) {
-        holder.titleTextView.setText(note.title);
-        holder.contentTextView.setText(note.content);
-        holder.timestampTextView.setText(Utility.timestampToString(note.timestamp));
+        holder.titleTextView.setText(note.getTitle());
+        holder.contentTextView.setText(note.getContent());
+        holder.timestampTextView.setText(Utility.timestampToString(note.getTimestamp()));
 
-        holder.itemView.setOnClickListener((v)->{
-            Intent intent = new Intent(context,NoteDetailsActivity.class);
-            intent.putExtra("title",note.title);
-            intent.putExtra("content",note.content);
+        holder.itemView.setOnClickListener((v) -> {
+            Intent intent = new Intent(context, NoteDetailsActivity.class);
+            intent.putExtra("title", note.getTitle());
+            intent.putExtra("content", note.getContent());
+            intent.putExtra("dueDate", note.getDueDate());
+            intent.putExtra("dueTime", note.getDueTime());
             String docId = this.getSnapshots().getSnapshot(position).getId();
-            intent.putExtra("docId",docId);
+            intent.putExtra("docId", docId);
             context.startActivity(intent);
         });
     }
@@ -41,12 +43,12 @@ public class NoteAdapter extends FirestoreRecyclerAdapter<Note, NoteAdapter.Note
     @NonNull
     @Override
     public NoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_note_item,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_note_item, parent, false);
         return new NoteViewHolder(view);
     }
 
-    class NoteViewHolder extends RecyclerView.ViewHolder{
-        TextView titleTextView,contentTextView,timestampTextView;
+    static class NoteViewHolder extends RecyclerView.ViewHolder {
+        TextView titleTextView, contentTextView, timestampTextView;
 
         public NoteViewHolder(@NonNull View itemView) {
             super(itemView);

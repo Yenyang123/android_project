@@ -6,9 +6,28 @@ public class Note {
     String title;
     String content;
     Timestamp timestamp;
+    private String dueDate;  // Format: YYYY-MM-DD
+    private String dueTime;  // Format: HH:MM
 
-    public Note() {
+
+
+    public Note(String title, String content, String dueDate, String dueTime, Timestamp timestamp) {
+        this.title = title;
+        this.content = content;
+        this.dueDate = dueDate;
+        this.dueTime = dueTime;
+        this.timestamp = timestamp;
     }
+
+    // Default constructor for Firebase
+    public Note() { }
+
+    // Getters and Setters
+    public String getDueDate() { return dueDate; }
+    public void setDueDate(String dueDate) { this.dueDate = dueDate; }
+
+    public String getDueTime() { return dueTime; }
+    public void setDueTime(String dueTime) { this.dueTime = dueTime; }
 
     public String getTitle() {
         return title;
