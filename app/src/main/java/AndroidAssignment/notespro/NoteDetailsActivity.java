@@ -1,33 +1,37 @@
 package AndroidAssignment.notespro;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
-
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class NoteDetailsActivity extends AppCompatActivity {
-
     EditText titleEditText, contentEditText;
     ImageButton saveNoteBtn;
     TextView pageTitleTextView, deleteNoteTextViewBtn, textViewDueDate, textViewDueTime;
     String docId;
     boolean isEditMode = false;
     final Calendar calendar = Calendar.getInstance();
+    private AlarmManager alarmManager;
 
     @SuppressLint({"SetTextI18n", "MissingInflatedId"})
     @Override
@@ -42,8 +46,8 @@ public class NoteDetailsActivity extends AppCompatActivity {
         deleteNoteTextViewBtn = findViewById(R.id.delete_note_text_view_btn);
         textViewDueDate = findViewById(R.id.textViewDueDate);
         textViewDueTime = findViewById(R.id.textViewDueTime);
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
-        // Set up listeners for date and time selection
         textViewDueDate.setOnClickListener(v -> showDatePickerDialog());
         textViewDueTime.setOnClickListener(v -> showTimePickerDialog());
 
@@ -59,7 +63,6 @@ public class NoteDetailsActivity extends AppCompatActivity {
         }
 
         saveNoteBtn.setOnClickListener((v) -> saveNote());
-
         deleteNoteTextViewBtn.setOnClickListener((v) -> deleteNoteFromFirebase());
     }
 
@@ -101,6 +104,9 @@ public class NoteDetailsActivity extends AppCompatActivity {
         noteData.put("dueTime", dueTime);
 
         saveNoteToFirebase(noteData);
+
+        // Schedule reminders
+        scheduleReminders(noteTitle, dueDate, dueTime);
     }
 
     private void saveNoteToFirebase(Map<String, Object> noteData) {
@@ -139,5 +145,37 @@ public class NoteDetailsActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void scheduleReminders(String title, String dueDate, String dueTime) {
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(format.parse(dueDate + " " + dueTime));
+            long deadlineMillis = calendar.getTimeInMillis();
+
+            scheduleAlarm(deadlineMillis - (7 * 24 * 60 * 60 * 1000), title, "1 week before deadline");
+            scheduleAlarm(deadlineMillis - (3 * 24 * 60 * 60 * 1000), title, "3 days before deadline");
+            scheduleAlarm(deadlineMillis - (24 * 60 * 60 * 1000), title, "1 day before deadline");
+            scheduleAlarm(deadlineMillis - (60 * 1000), title, "1 minute before deadline");
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void scheduleAlarm(long triggerTime, String noteTitle, String reminderType) {
+        Intent intent = new Intent(this, ReminderReceiver.class);
+        intent.putExtra("noteTitle", noteTitle);
+        intent.putExtra("reminderType", reminderType);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                this,
+                (int) (triggerTime / 1000),
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
+
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
     }
 }

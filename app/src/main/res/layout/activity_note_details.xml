@@ -89,16 +89,17 @@
             android:background="?attr/selectableItemBackground"
             android:gravity="center" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/delete_note_text_view_btn"
+            android:text="Delete note"
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
+            android:textSize="18sp"
+            android:textColor="#FF0000"/>
+
     </LinearLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/delete_note_text_view_btn"
-        android:text="Delete note"
-        android:layout_alignParentBottom="true"
-        android:gravity="center"
-        android:textSize="18sp"
-        android:visibility="gone"
-        android:textColor="#FF0000"/>
+
 </RelativeLayout>

@@ -12,6 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NotesPro"
         tools:targetApi="31">
+
         <activity
             android:name=".ChangePasswordActivity"
             android:exported="false" />
@@ -37,6 +38,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver android:name=".ReminderReceiver" android:enabled="true" android:exported="false" />
+
     </application>
 
 </manifest>
